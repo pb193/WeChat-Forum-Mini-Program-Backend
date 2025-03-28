@@ -1,0 +1,224 @@
+GET /api/user：获取用户信息
+PUT /api/user：更新用户信息
+GET /api/posts：获取动态列表
+POST /api/posts：发布动态
+POST /api/comments：添加评论
+POST /api/likes：切换点赞状态
+POST /api/register：注册用户
+POST /api/login：用户登录
+
+
+
+
+
+-- 创建数据库
+CREATE DATABASE IF NOT EXISTS my_social_app
+    DEFAULT CHARACTER SET utf8mb4
+    DEFAULT COLLATE utf8mb4_unicode_ci;
+
+-- 使用数据库
+USE my_social_app;
+
+-- 创建 users 表
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    avatar VARCHAR(255) DEFAULT 'https://your-cloud-storage/default-avatar.png',
+    grade VARCHAR(255),
+    department VARCHAR(255),
+    bio TEXT,
+    role ENUM('admin', 'moderator', 'user', 'banned') DEFAULT 'user',
+    muteUntil DATETIME DEFAULT NULL,
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 创建 posts 表
+CREATE TABLE posts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    userId INT NOT NULL,
+    category VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    mediaFiles JSON DEFAULT '[]',
+    isAnonymous BOOLEAN DEFAULT FALSE,
+    username VARCHAR(255) NOT NULL,
+    avatar VARCHAR(255) NOT NULL,
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    likes INT DEFAULT 0,
+    likedBy JSON DEFAULT '[]',
+    reportCount INT DEFAULT 0,                     -- 新增：举报次数
+    reportedBy JSON DEFAULT '[]',                  -- 新增：举报者列表（存储用户ID）
+    status ENUM('published', 'collapsed', 'pending') DEFAULT 'published', -- 新增：帖子状态
+    FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_category (category),
+    INDEX idx_createdAt (createdAt)
+);
+
+-- 创建 comments 表
+CREATE TABLE comments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    postId INT NOT NULL,
+    userId INT NOT NULL,
+    parentId INT NULL,
+    username VARCHAR(255) NOT NULL,
+    avatar VARCHAR(255) NOT NULL,
+    content VARCHAR(500) NOT NULL,
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (postId) REFERENCES posts(id) ON DELETE CASCADE,
+    FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (parentId) REFERENCES comments(id) ON DELETE SET NULL
+);
+
+-- 创建 notices 表
+CREATE TABLE notices (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    userId INT NOT NULL,
+    content TEXT NOT NULL,
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- 创建 logs 表
+CREATE TABLE logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    adminId INT NOT NULL,
+    action VARCHAR(255) NOT NULL,
+    targetId INT,
+    targetType VARCHAR(50),
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (adminId) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- 插入测试数据
+INSERT INTO users (username, password, avatar, grade, department, bio, role)
+VALUES
+    ('testuser1', '$2b$10$examplehashedpassword', 'https://your-cloud-storage/avatar1.png', '大二', '计算机系', '这是一个测试用户', 'admin'),
+    ('testuser2', '$2b$10$examplehashedpassword', 'https://your-cloud-storage/avatar2.png', '大三', '电子系', '另一个测试用户', 'moderator'),
+    ('testuser3', '$2b$10$examplehashedpassword', 'https://your-cloud-storage/avatar3.png', '大一', '机械系', '新用户', 'user');
+
+INSERT INTO posts (userId, category, content, mediaFiles, isAnonymous, username, avatar, likes, likedBy)
+VALUES
+    (1, '吐槽', '今天天气真差！', '["https://your-cloud-storage/image1.jpg"]', FALSE, 'testuser1', 'https://your-cloud-storage/avatar1.png', 5, '[2, 3]'),
+    (2, '二手交易', '出售二手书籍', '[]', FALSE, 'testuser2', 'https://your-cloud-storage/avatar2.png', 2, '[1]'),
+    (3, '表白', '喜欢一个人怎么办', '[]', TRUE, 'testuser3', 'https://your-cloud-storage/avatar3.png', 10, '[1, 2]');
+
+INSERT INTO comments (postId, userId, username, avatar, content)
+VALUES
+    (1, 2, 'testuser2', 'https://your-cloud-storage/avatar2.png', '确实很糟糕'),
+    (2, 1, 'testuser1', 'https://your-cloud-storage/avatar1.png', '多少钱？'),
+    (3, 2, 'testuser2', 'https://your-cloud-storage/avatar2.png', '勇敢表白吧！');
+
+INSERT INTO notices (userId, content)
+VALUES
+    (1, '系统维护通知：明日 10:00-12:00 系统将暂停服务'),
+    (2, '欢迎新用户加入我们的社区！');
+
+INSERT INTO logs (adminId, action, targetId, targetType)
+VALUES
+    (1, '删除帖子', 1, 'post'),
+    (2, '禁言用户', 3, 'user');
+
+
+
+
+
+
+
+
+
+
+wechat/
+├── controllers/
+│   ├── commentController.js
+│   ├── likeController.js
+│   ├── postController.js
+│   └── userController.js
+├── models/
+│   ├── Comment.js
+│   ├── index.js
+│   ├── Post.js
+│   └── User.js
+├── node_modules/ (文件夹，显示为 library)
+├── quickstartFunctions/
+│   ├── functions/
+│   │   ├── comment.js
+│   │   ├── like.js
+│   │   ├── post.js
+│   │   └── user.js
+│   ├── config.js
+│   ├── index.js
+│   └── utils.js
+├── routes/
+│   └── index.js
+├── utils/
+│   └── utils.js
+├── .env
+├── package.json
+├── package-lock.json
+├── server.js
+└── WechatApplication.js
+
+
+
+
+
+
+
+
+
+/**
+ * 微信登录接口
+ * @route POST /wx-login
+ * @param {Object} req.body - 请求体
+ * @param {string} req.body.code - 微信登录 code
+ * @param {string} req.body.username - 用户昵称
+ * @param {string} req.body.avatar - 用户头像
+ * @returns {Object} 包含 JWT 令牌的响应
+ * @throws {400} 如果缺少必要参数
+ * @throws {500} 如果服务器发生错误
+ */
+router.post('/wx-login', async (req, res) => {
+  try {
+    const { code, username, avatar } = req.body;
+    if (!code || !username) {
+      return res.status(400).json({ success: false, message: '缺少必要参数: code 或 username' });
+    }
+
+    // 调用微信接口获取 openid
+    const appId = process.env.WX_APP_ID; // 微信小程序 AppID
+    const appSecret = process.env.WX_APP_SECRET; // 微信小程序 AppSecret
+    const url = `https://api.weixin.qq.com/sns/jscode2session?appid=${appId}&secret=${appSecret}&js_code=${code}&grant_type=authorization_code`;
+
+    const response = await axios.get(url);
+    const { openid, session_key } = response.data;
+    if (!openid) {
+      return res.status(500).json({ success: false, message: '无法获取微信 openid' });
+    }
+
+    // 检查用户是否存在
+    let user = await db.User.findOne({ where: { openid } });
+    if (!user) {
+      // 如果用户不存在，创建新用户
+      user = await db.User.create({
+        openid,
+        username,
+        avatar: avatar || 'https://your-cloud-storage/default-avatar.png',
+      });
+    } else {
+      // 如果用户存在，更新用户信息
+      await user.update({ username, avatar: avatar || user.avatar });
+    }
+
+    // 生成 JWT 令牌
+    const token = jwt.sign(
+        { userId: user.id, username: user.username, openid: user.openid },
+        process.env.JWT_SECRET,
+        { expiresIn: '1h' }
+    );
+
+    res.json({ success: true, data: { token } });
+  } catch (err) {
+    console.error('微信登录失败', err);
+    res.status(500).json({ success: false, message: '服务器错误，请稍后重试' });
+  }
+});
