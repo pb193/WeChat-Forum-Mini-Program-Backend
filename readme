@@ -1,4 +1,4 @@
-微信论坛小程序后端 / WeChat Forum Mini-Program Backend
+微信论坛小程序后端和前端 / WeChat Forum Mini-Program Backend front(微信小程序开发工具)
 概述 / Overview
 中文
 这是一个为微信论坛小程序设计的后端服务，基于 Node.js 和 Express.js 构建。它提供用户管理、帖子管理、评论功能、通知发布、文件上传以及管理员操作等功能，支持 JWT 认证和 Sequelize ORM 数据库操作。适用于社交论坛场景，支持普通用户、吧主（moderator）和超级管理员（admin）三种角色。
