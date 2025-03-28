@@ -1,224 +1,268 @@
-GET /api/user：获取用户信息
-PUT /api/user：更新用户信息
-GET /api/posts：获取动态列表
-POST /api/posts：发布动态
-POST /api/comments：添加评论
-POST /api/likes：切换点赞状态
-POST /api/register：注册用户
-POST /api/login：用户登录
+微信论坛小程序后端 / WeChat Forum Mini-Program Backend
+概述 / Overview
+中文
+这是一个为微信论坛小程序设计的后端服务，基于 Node.js 和 Express.js 构建。它提供用户管理、帖子管理、评论功能、通知发布、文件上传以及管理员操作等功能，支持 JWT 认证和 Sequelize ORM 数据库操作。适用于社交论坛场景，支持普通用户、吧主（moderator）和超级管理员（admin）三种角色。
 
+当前版本: 1.0
 
+最后更新: 2025年3月28日
 
+English
+This is a backend service designed for a WeChat forum mini-program, built with Node.js and Express.js. It provides user management, post management, commenting, notice posting, file uploading, and admin operations, with JWT authentication and Sequelize ORM for database management. Suitable for social forum scenarios, it supports three roles: regular users, moderators, and admins.
 
+Current Version: 1.0
 
--- 创建数据库
-CREATE DATABASE IF NOT EXISTS my_social_app
-    DEFAULT CHARACTER SET utf8mb4
-    DEFAULT COLLATE utf8mb4_unicode_ci;
+Last Updated: March 28, 2025
 
--- 使用数据库
-USE my_social_app;
+功能 / Features
+中文
+用户管理:
+用户注册、登录（调试模式支持快速登录）。
+更新个人资料（头像、年级、院系等）。
+查看用户信息（普通用户、吧主、管理员权限分级）。
+帖子管理:
+创建、删除帖子（支持匿名发布和多媒体文件）。
+点赞、取消点赞帖子。
+查看帖子列表（按类别、用户、时间排序）。
+举报和取消举报帖子。
+评论管理:
+添加、删除评论（支持用户自删和管理员操作）。
+查看帖子评论和用户评论历史。
+通知管理:
+吧主或管理员发布、删除通知。
+查看所有通知。
+管理员功能:
+删除帖子和评论（吧主和管理员）。
+禁言/解除禁言用户（吧主和管理员）。
+封禁/解禁用户（仅管理员）。
+查看操作日志和系统统计（仅管理员）。
+文件上传:
+支持头像和帖子附件上传（最多 10 个文件）。
+安全性:
+JWT 认证保护所有路由。
+角色权限控制（用户、吧主、管理员）。
+English
+User Management:
+User registration and login (debug mode for quick login).
+Update personal profile (avatar, grade, department, etc.).
+View user info (tiered permissions for users, moderators, admins).
+Post Management:
+Create and delete posts (supports anonymous posting and multimedia).
+Like/unlike posts.
+View post lists (sorted by category, user, or time).
+Report/cancel reporting posts.
+Comment Management:
+Add/delete comments (self-deletion and admin actions).
+View post comments and user comment history.
+Notice Management:
+Moderators/admins can post/delete notices.
+View all notices.
+Admin Features:
+Delete posts/comments (moderators and admins).
+Mute/unmute users (moderators and admins).
+Ban/unban users (admins only).
+View operation logs and system stats (admins only).
+File Upload:
+Supports avatar and post attachment uploads (up to 10 files).
+Security:
+JWT authentication for all routes.
+Role-based access control (user, moderator, admin).
+要求 / Requirements
+中文
+操作系统: Windows、Linux 或 macOS。
+Node.js 版本: 16.x 或更高。
+数据库: PostgreSQL、MySQL 或其他 Sequelize 支持的数据库。
+依赖项:
+express（Web 框架）
+jsonwebtoken（JWT 认证）
+sequelize（ORM）
+multer（文件上传）
+其他依赖详见 package.json。
+环境变量: JWT_SECRET（JWT 密钥）。
+English
+Operating System: Windows, Linux, or macOS.
+Node.js Version: 16.x or higher.
+Database: PostgreSQL, MySQL, or other Sequelize-supported databases.
+Dependencies:
+express (Web framework)
+jsonwebtoken (JWT authentication)
+sequelize (ORM)
+multer (File upload)
+See package.json for full list.
+Environment Variables: JWT_SECRET (JWT secret key).
+安装 / Installation
+中文
+安装 Node.js: 确保已安装 Node.js 16+（下载地址)。
+克隆项目:
+bash
 
--- 创建 users 表
-CREATE TABLE users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(255) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    avatar VARCHAR(255) DEFAULT 'https://your-cloud-storage/default-avatar.png',
-    grade VARCHAR(255),
-    department VARCHAR(255),
-    bio TEXT,
-    role ENUM('admin', 'moderator', 'user', 'banned') DEFAULT 'user',
-    muteUntil DATETIME DEFAULT NULL,
-    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
-);
+Collapse
 
--- 创建 posts 表
-CREATE TABLE posts (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    userId INT NOT NULL,
-    category VARCHAR(255) NOT NULL,
-    content TEXT NOT NULL,
-    mediaFiles JSON DEFAULT '[]',
-    isAnonymous BOOLEAN DEFAULT FALSE,
-    username VARCHAR(255) NOT NULL,
-    avatar VARCHAR(255) NOT NULL,
-    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-    likes INT DEFAULT 0,
-    likedBy JSON DEFAULT '[]',
-    reportCount INT DEFAULT 0,                     -- 新增：举报次数
-    reportedBy JSON DEFAULT '[]',                  -- 新增：举报者列表（存储用户ID）
-    status ENUM('published', 'collapsed', 'pending') DEFAULT 'published', -- 新增：帖子状态
-    FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE,
-    INDEX idx_category (category),
-    INDEX idx_createdAt (createdAt)
-);
+Wrap
 
--- 创建 comments 表
-CREATE TABLE comments (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    postId INT NOT NULL,
-    userId INT NOT NULL,
-    parentId INT NULL,
-    username VARCHAR(255) NOT NULL,
-    avatar VARCHAR(255) NOT NULL,
-    content VARCHAR(500) NOT NULL,
-    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (postId) REFERENCES posts(id) ON DELETE CASCADE,
-    FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (parentId) REFERENCES comments(id) ON DELETE SET NULL
-);
+Copy
+git clone https://github.com/pb193/WeChatForum1.git
+cd WeChatForum1
+安装依赖:
+bash
 
--- 创建 notices 表
-CREATE TABLE notices (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    userId INT NOT NULL,
-    content TEXT NOT NULL,
-    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
-);
+Collapse
 
--- 创建 logs 表
-CREATE TABLE logs (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    adminId INT NOT NULL,
-    action VARCHAR(255) NOT NULL,
-    targetId INT,
-    targetType VARCHAR(50),
-    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (adminId) REFERENCES users(id) ON DELETE CASCADE
-);
+Wrap
 
--- 插入测试数据
-INSERT INTO users (username, password, avatar, grade, department, bio, role)
-VALUES
-    ('testuser1', '$2b$10$examplehashedpassword', 'https://your-cloud-storage/avatar1.png', '大二', '计算机系', '这是一个测试用户', 'admin'),
-    ('testuser2', '$2b$10$examplehashedpassword', 'https://your-cloud-storage/avatar2.png', '大三', '电子系', '另一个测试用户', 'moderator'),
-    ('testuser3', '$2b$10$examplehashedpassword', 'https://your-cloud-storage/avatar3.png', '大一', '机械系', '新用户', 'user');
+Copy
+npm install
+配置环境变量:
+创建 .env 文件，添加：
+text
 
-INSERT INTO posts (userId, category, content, mediaFiles, isAnonymous, username, avatar, likes, likedBy)
-VALUES
-    (1, '吐槽', '今天天气真差！', '["https://your-cloud-storage/image1.jpg"]', FALSE, 'testuser1', 'https://your-cloud-storage/avatar1.png', 5, '[2, 3]'),
-    (2, '二手交易', '出售二手书籍', '[]', FALSE, 'testuser2', 'https://your-cloud-storage/avatar2.png', 2, '[1]'),
-    (3, '表白', '喜欢一个人怎么办', '[]', TRUE, 'testuser3', 'https://your-cloud-storage/avatar3.png', 10, '[1, 2]');
+Collapse
 
-INSERT INTO comments (postId, userId, username, avatar, content)
-VALUES
-    (1, 2, 'testuser2', 'https://your-cloud-storage/avatar2.png', '确实很糟糕'),
-    (2, 1, 'testuser1', 'https://your-cloud-storage/avatar1.png', '多少钱？'),
-    (3, 2, 'testuser2', 'https://your-cloud-storage/avatar2.png', '勇敢表白吧！');
+Wrap
 
-INSERT INTO notices (userId, content)
-VALUES
-    (1, '系统维护通知：明日 10:00-12:00 系统将暂停服务'),
-    (2, '欢迎新用户加入我们的社区！');
+Copy
+JWT_SECRET=your-secret-key
+DATABASE_URL=your-database-connection-string
+配置数据库:
+初始化数据库并创建表（见下文“数据库结构”）。
+配置 Sequelize 连接（修改 global.db 初始化代码）。
+运行程序:
+bash
 
-INSERT INTO logs (adminId, action, targetId, targetType)
-VALUES
-    (1, '删除帖子', 1, 'post'),
-    (2, '禁言用户', 3, 'user');
+Collapse
 
+Wrap
 
+Copy
+node server.js
+默认监听 http://localhost:3000。
+English
+Install Node.js: Ensure Node.js 16+ is installed (download here).
+Clone the Project:
+bash
 
+Collapse
 
+Wrap
 
+Copy
+git clone https://github.com/pb193/WeChatForum1.git
+cd WeChatForum1
+Install Dependencies:
+bash
 
+Collapse
 
+Wrap
 
+Copy
+npm install
+Configure Environment Variables:
+Create a .env file with:
+text
 
+Collapse
 
-wechat/
-├── controllers/
-│   ├── commentController.js
-│   ├── likeController.js
-│   ├── postController.js
-│   └── userController.js
-├── models/
-│   ├── Comment.js
-│   ├── index.js
-│   ├── Post.js
-│   └── User.js
-├── node_modules/ (文件夹，显示为 library)
-├── quickstartFunctions/
-│   ├── functions/
-│   │   ├── comment.js
-│   │   ├── like.js
-│   │   ├── post.js
-│   │   └── user.js
-│   ├── config.js
-│   ├── index.js
-│   └── utils.js
-├── routes/
-│   └── index.js
-├── utils/
-│   └── utils.js
-├── .env
-├── package.json
-├── package-lock.json
-├── server.js
-└── WechatApplication.js
+Wrap
 
+Copy
+JWT_SECRET=your-secret-key
+DATABASE_URL=your-database-connection-string
+Configure Database:
+Initialize the database and create tables (see “Database Schema” below).
+Configure Sequelize connection (modify global.db initialization code).
+Run the Application:
+bash
 
+Collapse
 
+Wrap
 
+Copy
+node server.js
+Runs by default at http://localhost:3000.
+使用指南 / Usage Guide
+中文
+启动服务: 运行 node server.js，访问 http://localhost:3000。
+调试登录:
+POST /debug-login 创建测试用户并获取 JWT token。
+帖子操作:
+GET /posts 查看帖子。
+POST /posts 创建新帖子。
+DELETE /posts/:id 删除帖子。
+管理员操作:
+DELETE /admin/posts/:id 删除帖子（吧主/管理员）。
+POST /admin/mute-user/:id 禁言用户。
+GET /admin/logs 查看操作日志（仅管理员）。
+文件上传:
+POST /upload/avatar 上传头像。
+POST /upload 上传帖子附件。
+English
+Start the Service: Run node server.js and visit http://localhost:3000.
+Debug Login:
+POST /debug-login to create a test user and get a JWT token.
+Post Operations:
+GET /posts to view posts.
+POST /posts to create a new post.
+DELETE /posts/:id to delete a post.
+Admin Operations:
+DELETE /admin/posts/:id to delete posts (moderator/admin).
+POST /admin/mute-user/:id to mute a user.
+GET /admin/logs to view logs (admin only).
+File Upload:
+POST /upload/avatar to upload an avatar.
+POST /upload to upload post attachments.
+数据库结构 / Database Schema
+以下是主要表结构（基于 Sequelize，使用 MySQL/PostgreSQL 示例）：
 
-
-
-
-
-/**
- * 微信登录接口
- * @route POST /wx-login
- * @param {Object} req.body - 请求体
- * @param {string} req.body.code - 微信登录 code
- * @param {string} req.body.username - 用户昵称
- * @param {string} req.body.avatar - 用户头像
- * @returns {Object} 包含 JWT 令牌的响应
- * @throws {400} 如果缺少必要参数
- * @throws {500} 如果服务器发生错误
- */
-router.post('/wx-login', async (req, res) => {
-  try {
-    const { code, username, avatar } = req.body;
-    if (!code || !username) {
-      return res.status(400).json({ success: false, message: '缺少必要参数: code 或 username' });
-    }
-
-    // 调用微信接口获取 openid
-    const appId = process.env.WX_APP_ID; // 微信小程序 AppID
-    const appSecret = process.env.WX_APP_SECRET; // 微信小程序 AppSecret
-    const url = `https://api.weixin.qq.com/sns/jscode2session?appid=${appId}&secret=${appSecret}&js_code=${code}&grant_type=authorization_code`;
-
-    const response = await axios.get(url);
-    const { openid, session_key } = response.data;
-    if (!openid) {
-      return res.status(500).json({ success: false, message: '无法获取微信 openid' });
-    }
-
-    // 检查用户是否存在
-    let user = await db.User.findOne({ where: { openid } });
-    if (!user) {
-      // 如果用户不存在，创建新用户
-      user = await db.User.create({
-        openid,
-        username,
-        avatar: avatar || 'https://your-cloud-storage/default-avatar.png',
-      });
-    } else {
-      // 如果用户存在，更新用户信息
-      await user.update({ username, avatar: avatar || user.avatar });
-    }
-
-    // 生成 JWT 令牌
-    const token = jwt.sign(
-        { userId: user.id, username: user.username, openid: user.openid },
-        process.env.JWT_SECRET,
-        { expiresIn: '1h' }
-    );
-
-    res.json({ success: true, data: { token } });
-  } catch (err) {
-    console.error('微信登录失败', err);
-    res.status(500).json({ success: false, message: '服务器错误，请稍后重试' });
-  }
-});
+Users 表
+id (INTEGER, 主键, 自增)
+username (STRING, 唯一)
+password (STRING)
+avatar (STRING)
+grade (STRING)
+department (STRING)
+bio (STRING)
+role (ENUM: 'user', 'moderator', 'admin', 'banned')
+muteUntil (DATE)
+Posts 表
+id (INTEGER, 主键, 自增)
+userId (INTEGER, 外键 -> Users.id)
+category (STRING)
+content (TEXT)
+mediaFiles (JSON)
+isAnonymous (BOOLEAN)
+username (STRING)
+avatar (STRING)
+likedBy (JSON)
+createdAt (DATE)
+Comments 表
+id (INTEGER, 主键, 自增)
+postId (INTEGER, 外键 -> Posts.id)
+userId (INTEGER, 外键 -> Users.id)
+username (STRING)
+content (TEXT)
+createdAt (DATE)
+Notices 表
+id (INTEGER, 主键, 自增)
+userId (INTEGER, 外键 -> Users.id)
+content (TEXT)
+createdAt (DATE)
+Logs 表
+id (INTEGER, 主键, 自增)
+adminId (INTEGER, 外键 -> Users.id)
+action (STRING)
+targetId (INTEGER)
+targetType (STRING)
+createdAt (DATE)
+注意事项 / Notes
+中文
+JWT 密钥: 未设置 JWT_SECRET 将导致认证失败。
+数据库: 确保数据库连接正确配置。
+文件存储: 默认存储在 uploads/ 目录，生产环境建议使用云存储。
+安全性: 生产环境需启用 HTTPS 并限制文件类型。
+English
+JWT Secret: Missing JWT_SECRET will cause authentication failures.
+Database: Ensure correct database connection setup.
+File Storage: Defaults to uploads/ directory; use cloud storage in production.
+Security: Enable HTTPS and restrict file types in production.
