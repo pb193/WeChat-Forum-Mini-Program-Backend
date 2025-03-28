@@ -1,0 +1,87 @@
+<!-- index.wxml -->
+<view class="container">
+  <!-- 页面类型指示 -->
+  <view class="page-header" wx:if="{{currentPage !== 'default'}}">
+    <text class="page-title">{{currentPage}}</text>
+  </view>
+
+  <!-- 加载状态提示 -->
+  <view class="loading" wx:if="{{loading}}">
+    <image src="/images/loading.gif" class="loading-icon"></image>
+    <text>加载中...</text>
+  </view>
+
+  <!-- 朋友圈动态列表 -->
+  <scroll-view class="feed-list" scroll-y bind:refresherrefresh="onPullDownRefresh" refresher-enabled>
+    <block wx:for="{{posts}}" wx:key="_id">
+      <view class="post {{activePostIndex === index ? 'active' : ''}}">
+        <!-- 用户信息 -->
+        <view class="post-header">
+          <image class="avatar" src="{{item.avatar || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+          <view class="user-info">
+            <text class="username">{{item.username}}</text>
+            <text class="time">{{item.time}}</text>
+          </view>
+        </view>
+
+        <!-- 内容 -->
+        <text class="post-content">{{item.content}}</text>
+
+        <!-- 图片/视频（可选） -->
+        <view class="post-images" wx:if="{{item.mediaFiles && item.mediaFiles.length > 0}}">
+          <image 
+            wx:for="{{item.mediaFiles}}" 
+            wx:for-index="imgIndex" 
+            wx:for-item="media" 
+            wx:key="imgIndex" 
+            src="{{media || '/images/default-image.png'}}" 
+            mode="widthFix" 
+            class="post-image"
+            bindtap="previewImage"
+            data-index="{{index}}"
+            data-img-index="{{imgIndex}}"
+            bind:error="handleImageError"
+          ></image>
+        </view>
+
+        <!-- 互动区域 -->
+        <view class="post-actions">
+          <view class="action" bindtap="toggleLike" data-post-index="{{index}}">
+            <image class="action-icon" src="{{item.liked ? '/images/liked.png' : '/images/like.png'}}"></image>
+            <text class="action-text">{{item.likes}} 赞</text>
+          </view>
+          <view class="action" bindtap="showComment" data-post-index="{{index}}">
+            <image class="action-icon" src="/images/comment.png"></image>
+            <text class="action-text">{{item.comments.length}} 评论</text>
+          </view>
+        </view>
+
+        <!-- 评论列表 -->
+        <view class="comments" wx:if="{{item.showComments && item.comments.length > 0}}">
+          <block wx:for="{{item.comments}}" wx:key="time">
+            <view class="comment">
+              <text class="comment-user">{{item.username}}</text>
+              <text class="comment-content">{{item.content}}</text>
+            </view>
+          </block>
+        </view>
+
+        <!-- 输入评论区域（展开时显示） -->
+        <view class="comment-input" wx:if="{{item.showCommentInput}}">
+          <input 
+            placeholder="写评论..." 
+            bindinput="onCommentInput" 
+            value="{{item.commentInput}}" 
+            class="comment-input-field"
+            data-post-index="{{index}}"
+          />
+          <button class="comment-submit" bindtap="submitComment" data-post-index="{{index}}">发送</button>
+        </view>
+      </view>
+    </block>
+    <!-- 空状态提示 -->
+    <view class="empty" wx:if="{{!loading && posts.length === 0}}">
+      <text>暂无动态</text>
+    </view>
+  </scroll-view>
+</view>

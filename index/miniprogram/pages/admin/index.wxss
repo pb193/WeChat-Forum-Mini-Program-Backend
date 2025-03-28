@@ -1,0 +1,164 @@
+/* WeChat-inspired styles */
+.admin-page {
+  background-color: #f8f8f8;
+  min-height: 100vh;
+  padding: 20rpx;
+}
+
+.header {
+  padding: 20rpx;
+  background-color: #fff;
+  border-bottom: 1rpx solid #e5e5e5;
+  margin-bottom: 20rpx;
+}
+
+.role-text {
+  font-size: 32rpx;
+  color: #333;
+}
+
+.section {
+  margin-bottom: 20rpx;
+  background-color: #fff;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+
+.section-header {
+  padding: 20rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1rpx solid #e5e5e5;
+}
+
+.section-title {
+  font-size: 34rpx;
+  color: #000;
+  font-weight: 500;
+}
+
+.toggle-icon {
+  font-size: 24rpx;
+  color: #888;
+}
+
+.list {
+  padding: 0 20rpx;
+}
+
+.list-item {
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #e5e5e5;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-direction: column;
+}
+
+.list-item:last-child {
+  border-bottom: none;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 10rpx;
+}
+
+.content {
+  font-size: 28rpx;
+  color: #333;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta {
+  font-size: 24rpx;
+  color: #888;
+  margin-left: 20rpx;
+  flex-shrink: 0;
+}
+
+.user-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+}
+
+/* 新增搜索框样式 */
+.search-input {
+  width: 90%;
+  margin: 20rpx auto;
+  padding: 16rpx;
+  background-color: #f0f0f0;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.btn {
+  background-color: #fff;
+  color: #07c160;
+  border: 2rpx solid #07c160;
+  font-size: 24rpx;
+  padding: 8rpx 20rpx;
+  border-radius: 8rpx;
+  height: 48rpx;
+  line-height: 32rpx;
+}
+
+.btn-primary {
+  background-color: #07c160;
+  color: #fff;
+  border: none;
+  font-size: 28rpx;
+  padding: 16rpx 0;
+  margin: 20rpx;
+  border-radius: 8rpx;
+  text-align: center;
+  width: 90%;
+}
+
+.btn-danger {
+  background-color: #fff;
+  color: #fa5151;
+  border: 2rpx solid #fa5151;
+  font-size: 24rpx;
+  padding: 8rpx 20rpx;
+  border-radius: 8rpx;
+  height: 48rpx;
+  line-height: 32rpx;
+}
+
+.small-btn {
+  background-color: #fff;
+  color: #07c160;
+  border: 2rpx solid #07c160;
+  font-size: 22rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 6rpx;
+  height: 36rpx;
+  line-height: 26rpx;
+}
+
+.stats {
+  padding: 20rpx;
+}
+
+.stats text {
+  display: block;
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 10rpx;
+}
+
+.no-data {
+  padding: 20rpx;
+  text-align: center;
+  color: #999;
+  font-size: 28rpx;
+}

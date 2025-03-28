@@ -1,0 +1,102 @@
+<view class="post-detail-container">
+  <!-- 加载状态 -->
+  <view wx:if="{{loading}}" class="loading">
+    <text>加载中...</text>
+  </view>
+
+  <!-- 错误提示 -->
+  <view wx:if="{{error}}" class="error">
+    <text>{{error}}</text>
+  </view>
+
+  <!-- 帖子详情 -->
+  <view wx:if="{{!loading && !error}}" class="post-card">
+    <!-- 用户信息 -->
+    <view class="post-header">
+      <image class="avatar" src="{{post.avatar || 'https://via.placeholder.com/40'}}" mode="aspectFill" />
+      <view class="header-info">
+        <text class="username">{{post.username}}</text>
+        <view class="meta">
+          <text class="post-time">{{formatTime(post.createdAt)}}</text>
+          <text class="post-category">[{{post.category}}]</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 帖子内容 -->
+    <view class="post-content">
+      <text>{{post.content}}</text>
+      <!-- 图片缩略图 -->
+      <view class="image-gallery">
+  <view wx:if="{{post.mediaFiles && post.mediaFiles.length > 0}}" class="gallery-container">
+    <view wx:for="{{post.mediaFiles}}" wx:key="index" class="thumbnail-wrapper">
+      <image
+        src="{{item}}"
+        class="thumbnail"
+        mode="aspectFill"
+        bindtap="previewImage"
+        data-index="{{index}}"
+        binderror="onImageError"
+        bindload="onImageLoad"
+      />
+    </view>
+  </view>
+  <view wx:else class="no-images">
+    <text>暂无图片</text>
+  </view>
+</view>
+      </view>
+  
+
+    <!-- 交互区域 -->
+    <view class="interaction-section">
+      <view class="like-comment">
+        <text class="like-count">赞 {{post.likeCount}}</text>
+        <text class="comment-count">评论 {{comments.length}}</text>
+      </view>
+      <view class="action-bar">
+        <button class="action-btn" bindtap="toggleLike" disabled="{{loading}}">
+          <image src="{{isLiked ? 'https://via.placeholder.com/36/FF0000/FFFFFF?text=Liked' : 'https://via.placeholder.com/36?text=Like'}}" class="action-icon" />
+          <text>{{isLiked ? '取消' : '赞'}}</text>
+        </button>
+        <button class="action-btn" open-type="share">
+          <image src="https://via.placeholder.com/36?text=Share" class="action-icon" />
+          <text>分享</text>
+        </button>
+      </view>
+    </view>
+
+    <!-- 评论列表 -->
+    <view class="comment-section">
+      <view wx:for="{{comments}}" wx:key="id" class="comment-item">
+        <text class="comment-user">{{item.username}}:</text>
+        <text class="comment-content">{{item.content}}</text>
+        <text class="comment-time">{{formatTime(item.createdAt)}}</text>
+      </view>
+      <view wx:if="{{comments.length === 0}}" class="empty">
+        <text>暂无评论，快来抢沙发吧！</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 添加评论 -->
+  <view class="comment-input-bar">
+    <textarea
+      placeholder="说点什么..."
+      value="{{commentInput}}"
+      bind:input="onCommentInput"
+      disabled="{{loading}}"
+      class="comment-input"
+      auto-height="true"
+      adjust-position="true"
+      maxlength="200"
+    />
+    <button 
+      class="submit-btn" 
+      bindtap="submitComment" 
+      disabled="{{isSubmitDisabled}}"
+    >
+      发送
+    </button>
+  </view>
+</view>

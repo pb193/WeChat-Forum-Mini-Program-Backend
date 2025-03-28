@@ -1,0 +1,91 @@
+<view class="page_container">
+  <view class="top_bg" />
+  <view class="main_content">
+    <view wx:if="{{loading}}" class="loading">加载中...</view>
+    <!-- 选项卡 -->
+    <view class="tab-bar">
+      <view class="tab-item {{activeTab === 'profile' ? 'active' : ''}}" data-tab="profile" bindtap="switchTab">个人资料</view>
+      <view class="tab-item {{activeTab === 'myPosts' ? 'active' : ''}}" data-tab="myPosts" bindtap="switchTab">我的帖子</view>
+      <view class="tab-item {{activeTab === 'myActivity' ? 'active' : ''}}" data-tab="myActivity" bindtap="switchTab">我的互动</view>
+      <!-- 新增管理员页面选项卡，仅管理员或吧主可见 -->
+      <view wx:if="{{userInfo && (userInfo.role === 'admin' || userInfo.role === 'moderator')}}" 
+            class="tab-item {{activeTab === 'admin' ? 'active' : ''}}" 
+            data-tab="admin" 
+            bindtap="switchTab">管理员页面</view>
+    </view>
+
+    <!-- 个人资料 -->
+    <view wx:if="{{activeTab === 'profile'}}" class="profile-section">
+      <view class="userinfo_container">
+        <image class="avatar" src="{{avatarUrl}}" bindtap="getWechatAvatar" />
+        <view class="user-meta">
+          <view class="username">{{username}}</view>
+          <view wx:if="{{hasGrade}}" class="user-department">{{grade}} {{department}}</view>
+        </view>
+        <button class="edit-btn" bindtap="navigateToEdit">编辑资料</button>
+        <button class="logout-btn" bindtap="logout">退出登录</button>
+      </view>
+      <view class="bio-section" wx:if="{{bio}}">
+        <text class="bio-text">{{bio}}</text>
+      </view>
+    </view>
+
+    <!-- 我的帖子 -->
+    <view wx:if="{{activeTab === 'myPosts'}}" class="posts-section">
+      <view class="sort-bar">
+        <view class="sort-btn {{myPostsSortBy === 'createdAt' ? 'active' : ''}}" 
+              data-sort-by="createdAt" 
+              data-sort-order="desc" 
+              bindtap="sortMyPosts">
+          时间 {{myPostsSortBy === 'createdAt' ? (myPostsSortOrder === 'desc' ? '↓' : '↑') : ''}}
+        </view>
+        <view class="sort-btn {{myPostsSortBy === 'category' ? 'active' : ''}}" 
+              data-sort-by="category" 
+              data-sort-order="desc" 
+              bindtap="sortMyPosts">
+          分类 {{myPostsSortBy === 'category' ? (myPostsSortOrder === 'desc' ? '↓' : '↑') : ''}}
+        </view>
+      </view>
+      <view wx:for="{{myPosts}}" wx:key="id" class="post-item" bindtap="navigateToPostDetail" data-id="{{item.id}}">
+        <text class="post-category">[{{item.category}}]</text>
+        <text class="post-content">{{item.content}}</text>
+        <text class="post-time">{{formatTime(item.createdAt)}}</text>
+        <button class="delete-btn" data-id="{{item.id}}" bindtap="deletePost">删除</button>
+      </view>
+      <view wx:if="{{myPosts.length === 0}}" class="empty">暂无帖子</view>
+    </view>
+
+    <!-- 我的互动 -->
+    <view wx:if="{{activeTab === 'myActivity'}}" class="posts-section">
+      <view class="sort-bar">
+        <view class="sort-btn {{myActivitySortBy === 'createdAt' ? 'active' : ''}}" 
+              data-sort-by="createdAt" 
+              data-sort-order="desc" 
+              bindtap="sortMyActivity">
+          时间 {{myActivitySortBy === 'createdAt' ? (myActivitySortOrder === 'desc' ? '↓' : '↑') : ''}}
+        </view>
+      </view>
+      <view wx:for="{{myActivity}}" wx:key="id" class="post-item" bindtap="navigateToPostDetail" data-id="{{item.postId}}">
+        <text class="post-category" wx:if="{{item.type === 'liked'}}">[点赞][{{item.category}}]</text>
+        <text class="post-category" wx:if="{{item.type === 'comment'}}">[评论]</text>
+        <text class="post-content" wx:if="{{item.type === 'liked'}}">{{item.content}}</text>
+        <text class="post-content" wx:if="{{item.type === 'comment'}}">帖子: {{item.postContent}}</text>
+        <text class="comment-content" wx:if="{{item.type === 'comment'}}">我的评论: {{item.content}}</text>
+        <text class="post-time">{{formatTime(item.createdAt)}}</text>
+        <button wx:if="{{item.type === 'comment'}}" class="delete-btn" data-id="{{item.commentId}}" bindtap="deleteComment">删除评论</button>
+      </view>
+      <view wx:if="{{myActivity.length === 0}}" class="empty">暂无互动</view>
+    </view>
+
+    <!-- 提示弹窗 -->
+    <view class="modal" wx:if="{{showTip}}">
+      <view class="modal-content">
+        <view class="modal-title">{{title}}</view>
+        <view class="modal-body">{{content}}</view>
+        <view class="modal-footer">
+          <button class="modal-btn" bindtap="onCloseTipModal">确定</button>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

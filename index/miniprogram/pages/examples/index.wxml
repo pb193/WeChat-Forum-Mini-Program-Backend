@@ -1,0 +1,57 @@
+<!-- pages/post/post.wxml -->
+<view class="container">
+  <view class="header">
+    <button class="cancel" bindtap="cancel">取消</button>
+    <picker bind:change="bindCategoryChange" value="{{categoryIndex}}" range="{{categories}}" class="category-picker">
+      <view class="category-text">{{categories[categoryIndex]}}</view>
+    </picker>
+    <button class="publish" bindtap="submitPost" disabled="{{!content || submitting}}">发表</button>
+  </view>
+
+  <view class="content">
+    <textarea 
+      placeholder="分享新鲜事..." 
+      bindinput="bindContent" 
+      value="{{content}}"
+      class="content-input"
+      placeholder-class="placeholder"
+    ></textarea>
+  </view>
+
+  <view class="media">
+    <view class="image-grid">
+      <view wx:for="{{mediaFiles}}" wx:key="index" class="media-item">
+        <image 
+          src="{{item}}" 
+          mode="aspectFill" 
+          class="grid-image"
+          bindtap="previewMedia"
+          data-index="{{index}}"
+        ></image>
+        <button class="delete-btn" bindtap="deleteMedia" data-index="{{index}}">×</button>
+      </view>
+      <button 
+        class="upload-btn" 
+        bindtap="chooseMedia" 
+        wx:if="{{mediaFiles.length < 9}}"
+      >
+        <text class="plus">+</text>
+      </button>
+    </view>
+  </view>
+
+  <!-- 匿名开关 -->
+  <view class="anonymous-section">
+    <view class="anonymous-label">匿名发布</view>
+    <switch 
+      checked="{{isAnonymous}}" 
+      bindchange="toggleAnonymous" 
+      color="#007aff"
+    />
+  </view>
+
+  <!-- 上传进度 -->
+  <view class="progress-section" wx:if="{{submitting && uploadProgress > 0}}">
+    <text>正在上传媒体文件：{{uploadProgress}}%</text>
+  </view>
+</view>

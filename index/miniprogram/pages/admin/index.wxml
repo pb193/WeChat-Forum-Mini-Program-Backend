@@ -1,0 +1,144 @@
+<view class="admin-page">
+  <!-- 顶部导航 -->
+  <view class="header">
+    <text class="role-text">角色: {{role === 'admin' ? '超级管理员' : role === 'moderator' ? '吧主' : '未知'}}</text>
+  </view>
+
+  <!-- 我的帖子 -->
+  <view class="section">
+    <view class="section-header" bindtap="toggleSection" data-section="myPosts">
+      <view class="section-title">我的帖子</view>
+      <view class="toggle-icon">{{collapsed.myPosts ? '展开' : '收起'}}</view>
+    </view>
+    <view class="list" wx:if="{{!collapsed.myPosts}}">
+      <view wx:for="{{myPosts}}" wx:key="id" class="list-item">
+        <view class="content" bindtap="goToPostDetail" data-id="{{item.id}}">{{item.content}}</view>
+        <view class="meta">点赞: {{item.likes || 0}}</view>
+        <button class="btn-danger" bindtap="deletePost" data-id="{{item.id}}">删除</button>
+      </view>
+      <view wx:if="{{!myPosts.length}}" class="no-data">暂无帖子</view>
+    </view>
+  </view>
+
+  <!-- 帖子管理 -->
+  <view class="section">
+    <view class="section-header" bindtap="toggleSection" data-section="posts">
+      <view class="section-title">帖子管理</view>
+      <view class="toggle-icon">{{collapsed.posts ? '展开' : '收起'}}</view>
+    </view>
+    <view class="list" wx:if="{{!collapsed.posts}}">
+      <view wx:for="{{posts}}" wx:key="id" class="list-item">
+        <view class="content" bindtap="goToPostDetail" data-id="{{item.id}}">{{item.content}}</view>
+        <view class="meta">点赞: {{item.likes || 0}}</view>
+        <button class="btn-danger" bindtap="deletePost" data-id="{{item.id}}">删除</button>
+      </view>
+      <view wx:if="{{!posts.length}}" class="no-data">暂无热门帖子</view>
+    </view>
+  </view>
+
+  <!-- 用户管理 -->
+  <view class="section">
+    <view class="section-header" bindtap="toggleSection" data-section="users">
+      <view class="section-title">用户管理</view>
+      <view class="toggle-icon">{{collapsed.users ? '展开' : '收起'}}</view>
+    </view>
+    <view class="list" wx:if="{{!collapsed.users}}">
+      <!-- 添加搜索框 -->
+      <input type="text" 
+             placeholder="搜索用户名" 
+             value="{{searchQuery}}" 
+             bindinput="onSearchInput" 
+             class="search-input" />
+      <view wx:for="{{filteredUsers}}" wx:key="id" class="list-item">
+        <view class="user-info">
+          <view class="content">{{item.username || '无用户名'}}</view>
+          <view class="meta" wx:if="{{item.muteUntil}}">禁言至: {{item.muteUntil}}</view>
+        </view>
+        <view class="user-actions">
+          <button class="small-btn" bindtap="muteUser" data-id="{{item.id}}">禁言</button>
+          <button class="small-btn" bindtap="unmuteUser" data-id="{{item.id}}">解禁言</button>
+          <button wx:if="{{role === 'admin'}}" class="btn-danger" bindtap="banUser" data-id="{{item.id}}">封禁</button>
+          <button wx:if="{{role === 'admin'}}" class="btn" bindtap="unbanUser" data-id="{{item.id}}">解封</button>
+        </view>
+      </view>
+      <view wx:if="{{!filteredUsers.length}}" class="no-data">暂无用户</view>
+    </view>
+  </view>
+
+
+<!-- 举报最多帖子 -->
+<view class="section">
+    <view class="section-header" bindtap="toggleSection" data-section="reportedPosts">
+      <view class="section-title">举报最多帖子</view>
+      <view class="toggle-icon">{{collapsed.reportedPosts ? '展开' : '收起'}}</view>
+    </view>
+    <view class="list" wx:if="{{!collapsed.reportedPosts}}">
+      <view wx:for="{{reportedPosts}}" wx:key="id" class="list-item">
+        <view class="content" bindtap="goToPostDetail" data-id="{{item.id}}">{{item.content}}</view>
+        <view class="meta">举报次数: {{item.reportCount}} | 状态: {{item.status === 'collapsed' ? '已收起' : '正常'}}</view>
+        <button class="btn-danger" bindtap="deletePost" data-id="{{item.id}}">删除</button>
+      </view>
+      <view wx:if="{{!reportedPosts.length}}" class="no-data">暂无被举报超过5次的帖子</view>
+    </view>
+  </view>
+
+
+  <!-- 最高点赞帖子 -->
+  <view class="section">
+    <view class="section-header" bindtap="toggleSection" data-section="topPosts">
+      <view class="section-title">最高点赞帖子</view>
+      <view class="toggle-icon">{{collapsed.topPosts ? '展开' : '收起'}}</view>
+    </view>
+    <view class="list" wx:if="{{!collapsed.topPosts}}">
+      <view wx:for="{{topPosts}}" wx:key="id" class="list-item">
+        <view class="content" bindtap="goToPostDetail" data-id="{{item.id}}">{{item.content}}</view>
+        <view class="meta">点赞: {{item.likes || 0}}</view>
+      </view>
+      <view wx:if="{{!topPosts.length}}" class="no-data">暂无最高点赞帖子</view>
+    </view>
+  </view>
+  
+
+  <!-- 通知管理 -->
+  <view class="section">
+    <view class="section-header" bindtap="toggleSection" data-section="notices">
+      <view class="section-title">通知管理</view>
+      <view class="toggle-icon">{{collapsed.notices ? '展开' : '收起'}}</view>
+    </view>
+    <view class="list" wx:if="{{!collapsed.notices}}">
+      <button class="btn-primary" bindtap="publishNotice">发布通知</button>
+      <view wx:for="{{notices}}" wx:key="id" class="list-item">
+        <view class="content">{{item.content}}</view>
+        <button class="btn-danger" bindtap="deleteNotice" data-id="{{item.id}}">删除</button>
+      </view>
+      <view wx:if="{{!notices.length}}" class="no-data">暂无通知</view>
+    </view>
+  </view>
+
+  <!-- 操作日志 -->
+  <view class="section" wx:if="{{role === 'admin'}}">
+    <view class="section-header" bindtap="toggleSection" data-section="logs">
+      <view class="section-title">操作日志</view>
+      <view class="toggle-icon">{{collapsed.logs ? '展开' : '收起'}}</view>
+    </view>
+    <view class="list" wx:if="{{!collapsed.logs}}">
+      <view wx:for="{{logs}}" wx:key="id" class="list-item">
+        <view class="content">{{item.admin ? item.admin.username : '未知'}} - {{item.action}} - {{item.createdAt}}</view>
+      </view>
+      <view wx:if="{{!logs.length}}" class="no-data">暂无日志</view>
+    </view>
+  </view>
+
+  <!-- 系统统计 -->
+  <view class="section" wx:if="{{role === 'admin'}}">
+    <view class="section-header" bindtap="toggleSection" data-section="stats">
+      <view class="section-title">系统统计</view>
+      <view class="toggle-icon">{{collapsed.stats ? '展开' : '收起'}}</view>
+    </view>
+    <view class="stats" wx:if="{{!collapsed.stats}}">
+      <text>帖子总数: {{stats.postCount || 0}}</text>
+      <text>用户总数: {{stats.userCount || 0}}</text>
+      <text>评论总数: {{stats.commentCount || 0}}</text>
+    </view>
+  </view>
+</view>

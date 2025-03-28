@@ -1,0 +1,114 @@
+<!-- pages/index/index.wxml -->
+<view class="container">
+  <!-- 刷新按钮 -->
+  <view class="refresh-button" bindtap="manualRefresh">
+    <image src="/images/refresh.png" class="refresh-icon" />
+  </view>
+
+  <!-- 分类导航 -->
+  <view class="category-header">
+    <view class="category-item">
+      <image class="category-icon" src="/images/icon-flower.png" />
+      <text class="category-text">全部</text>
+    </view>
+    <view class="category-item active">
+      <text class="category-text">求助</text>
+    </view>
+    <view class="category-item">
+      <text class="category-text">吐槽</text>
+    </view>
+    <view class="category-item">
+      <text class="category-text">二手</text>
+    </view>
+  </view>
+
+  <!-- 统一加载提示 -->
+  <view class="loading-tip" wx:if="{{isRefreshing || loading}}">
+    <loading>
+      <image src="https://your-valid-cloud-storage/loading.gif" class="loading-icon" />
+      <text>{{isRefreshing ? '正在刷新...' : '加载中...'}}</text>
+    </loading>
+  </view>
+
+  <!-- 帖子列表 -->
+  <scroll-view 
+    class="feed-list" 
+    scroll-y 
+    enable-back-to-top 
+    bind:scrolltolower="onReachBottom" 
+    refresher-enabled="{{true}}" 
+    bind:refresherrefresh="onPullDownRefresh" 
+    scroll-top="{{scrollTop}}"
+  >
+    <view wx:for="{{posts}}" wx:key="id" class="post" bindtap="navigateToPostDetail" data-post-id="{{item.id}}">
+      <view class="post-header">
+        <image class="avatar" src="{{item.avatar || '/images/default-avatar.png'}}" mode="aspectFill" lazy-load="true" />
+        <view class="user-info">
+          <text class="username">{{item.username}}</text>
+          <view class="meta">
+            <text class="time">{{item.time}}</text>
+            <text class="category">[{{item.category}}]</text>
+          </view>
+        </view>
+      </view>
+      <view wx:if="{{!item.isCollapsed}}">
+        <text class="post-content">{{item.content}}</text>
+        <view class="post-images" wx:if="{{item.mediaFiles && item.mediaFiles.length > 0}}">
+          <image 
+            wx:for="{{item.mediaFiles}}" 
+            wx:for-item="media" 
+            wx:key="index" 
+            src="{{media || '/images/default-image.png'}}" 
+            mode="widthFix" 
+            class="post-image" 
+            lazy-load="true" 
+            bind:error="handleImageError" 
+            data-index="{{index}}" 
+            data-img-index="{{index}}"
+          />
+        </view>
+      </view>
+      <view wx:else class="collapsed-content">
+        <text>帖子已被多人举报，已收起</text>
+      </view>
+      <!-- 操作栏 -->
+      <view class="post-actions">
+        <button class="action" bindtap="toggleLike" data-post-index="{{index}}" open-type="none" plain>
+          <image class="action-icon" src="{{item.liked ? '/images/liked.png' : '/images/like.png'}}" />
+          <text class="action-text">{{item.likeCount}} 赞</text>
+        </button>
+        <button class="action" bindtap="showComment" data-post-index="{{index}}" open-type="none" plain>
+          <image class="action-icon" src="/images/comment.png" />
+          <text class="action-text">{{item.comments.length}} 评论</text>
+        </button>
+        <button class="action" bindtap="showCommentInput" data-post-index="{{index}}" open-type="none" plain>
+          <text class="action-text">写评论</text>
+        </button>
+        <button class="action" bindtap="toggleReport" data-post-index="{{index}}" open-type="none" plain>
+          <image class="action-icon" src="{{item.isReported ? '/images/reported.png' : '/images/report.png'}}" />
+          <text class="action-text">{{item.isReported ? '已举报' : '举报'}}</text>
+        </button>
+      </view>
+      <!-- 评论区 -->
+      <view class="comments" wx:if="{{item.showComments && item.comments.length > 0}}">
+        <view wx:for="{{item.comments}}" wx:key="id" class="comment">
+          <text class="comment-user">{{item.username}}</text>
+          <text class="comment-content">{{item.content}}</text>
+        </view>
+      </view>
+    </view>
+    <!-- 空状态和加载更多 -->
+    <view class="empty" wx:if="{{!loading && posts.length === 0}}">
+      <image src="/images/empty.png" class="empty-icon" />
+      <text wx:if="{{sortIndex === 1 && categoryIndex >= 0}}">当前分类下暂无动态</text>
+      <text wx:else>暂无动态</text>
+      <button class="refresh-btn" bindtap="manualRefresh">刷新</button>
+    </view>
+    <view class="loading-more" wx:if="{{isLoadingMore}}">
+      <loading>
+        <image src="/images/loading.gif" class="loading-icon" />
+        <text>加载更多...</text>
+      </loading>
+    </view>
+  </scroll-view>
+</view>

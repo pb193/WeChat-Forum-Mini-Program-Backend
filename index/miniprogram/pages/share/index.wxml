@@ -1,0 +1,8 @@
+<!-- pages/share/index.wxml -->
+<view class="container">
+  <view class="qr-code-container">
+    <image src="{{qrCodeUrl}}" mode="widthFix" wx:if="{{qrCodeUrl}}" />
+    <text wx:else>正在生成二维码...</text>
+  </view>
+  <button class="save-btn" bindtap="saveQRCode">保存到相册</button>
+</view>

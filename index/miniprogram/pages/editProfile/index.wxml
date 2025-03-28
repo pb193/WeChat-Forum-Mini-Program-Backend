@@ -1,0 +1,28 @@
+<view class="edit-container">
+  <view class="form-item">
+    <text class="label">头像</text>
+    <view class="avatar-container">
+      <image class="avatar" src="{{avatarUrl || 'https://via.placeholder.com/100'}}" mode="aspectFill" binderror="onImageError" />
+      <button class="upload-btn" bindtap="getUserProfile">获取微信头像</button>
+    </view>
+  </view>
+  <view class="form-item">
+    <text class="label">用户名</text>
+    <input class="input" value="{{username}}" data-field="username" bindinput="onInputChange" placeholder="请输入用户名" />
+  </view>
+  <view class="form-item">
+    <text class="label">年级</text>
+    <picker bind:change="bindGradeChange" value="{{gradeIndex}}" range="{{gradeOptions}}">
+      <view class="input">{{gradeIndex >= 0 ? gradeOptions[gradeIndex] : '请选择年级'}}</view>
+    </picker>
+  </view>
+  <view class="form-item">
+    <text class="label">院系</text>
+    <input class="input" value="{{department}}" data-field="department" bindinput="onInputChange" placeholder="请输入院系" />
+  </view>
+  <view class="form-item">
+    <text class="label">简介</text>
+    <textarea class="textarea" value="{{bio}}" data-field="bio" bindinput="onInputChange" placeholder="请输入简介" />
+  </view>
+  <button class="save-btn" bindtap="saveProfile">保存</button>
+</view>

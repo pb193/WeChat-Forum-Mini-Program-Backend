@@ -1,0 +1,42 @@
+/* pages/share/index.wxss */
+.container {
+  padding: 20rpx;
+  background-color: #f5f5f5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
+}
+
+.qr-code-container {
+  margin-top: 50rpx;
+  width: 430rpx;
+  height: 430rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #fff;
+  border-radius: 16rpx;
+  padding: 20rpx;
+}
+
+.qr-code-container image {
+  width: 100%;
+  height: auto;
+}
+
+.qr-code-container text {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.save-btn {
+  margin-top: 50rpx;
+  background-color: #007aff;
+  color: white;
+  font-size: 32rpx;
+  padding: 20rpx;
+  border-radius: 10rpx;
+  text-align: center;
+  width: 80%;
+}

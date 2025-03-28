@@ -1,0 +1,283 @@
+/* pages/index/index.wxss */
+.container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f2f3f5;
+}
+
+/* 刷新按钮 */
+.refresh-button {
+  position: fixed;
+  top: 20rpx;
+  right: 20rpx;
+  z-index: 999;
+}
+
+.refresh-icon {
+  width: 50rpx;
+  height: 50rpx;
+}
+
+/* 分类导航 */
+.category-header {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 20rpx 30rpx;
+  background: #fff;
+  border-bottom: 1rpx solid #ececec;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.category-item {
+  display: flex;
+  align-items: center;
+  margin-right: 30rpx;
+  padding: 10rpx 20rpx;
+  border-radius: 12rpx;
+}
+
+.category-item.active {
+  background: #f2f3f5;
+}
+
+.category-icon {
+  width: 40rpx;
+  height: 40rpx;
+  margin-right: 10rpx;
+}
+
+.category-text {
+  font-size: 28rpx;
+  color: #333;
+}
+
+/* 统一加载提示 */
+.loading-tip {
+  position: fixed;
+  top: 88rpx; /* 留出分类导航的高度 */
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100rpx;
+  z-index: 999;
+}
+
+.loading-tip loading {
+  display: flex;
+  align-items: center;
+}
+
+.loading-tip .loading-icon {
+  width: 40rpx;
+  height: 40rpx;
+  margin-right: 20rpx;
+}
+
+.loading-tip text {
+  font-size: 28rpx;
+  color: #666;
+}
+
+/* 帖子列表 */
+.feed-list {
+  flex: 1;
+  padding-bottom: 20rpx;
+  margin-top: 88rpx; /* 留出分类导航的高度 */
+  height: calc(100vh - 88rpx); /* 动态计算高度 */
+  overflow: hidden;
+}
+
+/* 单个帖子 */
+.post {
+  margin: 20rpx;
+  padding: 30rpx;
+  background: #fff;
+  border-radius: 16rpx;
+}
+
+/* Tap feedback */
+.post:active {
+  background: #f7f7f7;
+}
+
+/* 帖子头部 */
+.post-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  margin-right: 20rpx;
+}
+
+.user-info {
+  flex: 1;
+}
+
+.username {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #000;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  margin-top: 8rpx;
+}
+
+.time, .category {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.time {
+  margin-right: 20rpx;
+}
+
+/* 帖子内容 */
+.post-content {
+  font-size: 30rpx;
+  color: #000;
+  line-height: 1.6;
+  margin: 20rpx 0;
+  word-break: break-all;
+}
+
+/* 帖子图片 */
+.post-images {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200rpx, 1fr));
+  gap: 10rpx;
+  margin: 20rpx 0;
+}
+
+.post-image {
+  width: 100%;
+  height: 200rpx;
+  border-radius: 8rpx;
+  object-fit: cover;
+  background: #f2f3f5;
+}
+
+/* 操作栏 */
+.post-actions {
+  display: flex;
+  justify-content: space-between;
+  padding: 20rpx 0;
+  border-top: 1rpx solid #ececec;
+}
+
+.action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: 0;
+  background: none;
+  border: none;
+  line-height: normal;
+}
+
+.action::after {
+  border: none;
+}
+
+.action-icon {
+  width: 40rpx;
+  height: 40rpx;
+  margin-right: 10rpx;
+}
+
+button {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+button::after {
+  border: none !important;
+}
+
+.action-text {
+  font-size: 26rpx;
+  color: #999;
+}
+
+/* 评论区 */
+.comments {
+  margin-top: 20rpx;
+  padding: 20rpx;
+  background: #f7f7f7;
+  border-radius: 12rpx;
+}
+
+.comment {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 15rpx 0;
+}
+
+.comment-user {
+  font-size: 26rpx;
+  font-weight: 500;
+  color: #000;
+  margin-right: 15rpx;
+}
+
+.comment-content {
+  font-size: 26rpx;
+  color: #666;
+  flex: 1;
+}
+
+/* 加载和空状态 */
+.loading, .empty {
+  text-align: center;
+  padding: 40rpx;
+  font-size: 28rpx;
+  color: #999;
+}
+
+.empty-icon {
+  width: 200rpx;
+  height: 200rpx;
+  margin-bottom: 20rpx;
+}
+
+.loading-more {
+  text-align: center;
+  padding: 20rpx;
+  color: #999;
+}
+
+/* 收起内容样式 */
+.collapsed-content {
+  font-size: 28rpx;
+  color: #999;
+  text-align: center;
+  padding: 20rpx;
+  background: #f7f7f7;
+  border-radius: 8rpx;
+  margin: 20rpx 0;
+}
+.category-item {
+  display: flex;
+  align-items: center;
+  margin-right: 30rpx;
+  padding: 10rpx 20rpx;
+  border-radius: 12rpx;
+  transition: background 0.3s ease;
+}

@@ -1,0 +1,71 @@
+.edit-container {
+  padding: 40rpx;
+  background-color: #f5f5f5;
+  height: 100vh;
+}
+
+.form-item {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 30rpx;
+}
+
+.label {
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 10rpx;
+}
+
+.avatar-container {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.avatar {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%; /* 圆形头像 */
+}
+
+.upload-btn {
+  font-size: 20rpx; /* 缩小文字 */
+  color: #007aff;
+  border: 1rpx solid #007aff;
+  padding: 8rpx 16rpx; /* 缩小内边距 */
+  border-radius: 8rpx;
+  background: none;
+  width: 120rpx; /* 缩小宽度 */
+  height: 50rpx; /* 缩小高度 */
+  line-height: 1;
+  text-align: center;
+}
+
+.input {
+  padding: 20rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  color: #333;
+  border: 1rpx solid #eee;
+}
+
+.textarea {
+  padding: 20rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  color: #333;
+  border: 1rpx solid #eee;
+  height: 200rpx;
+}
+
+.save-btn {
+  margin-top: 40rpx;
+  font-size: 30rpx;
+  color: #fff;
+  background-color: #07c160;
+  padding: 20rpx;
+  border-radius: 16rpx;
+  text-align: center;
+}

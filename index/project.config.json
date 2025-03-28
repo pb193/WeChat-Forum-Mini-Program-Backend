@@ -1,0 +1,86 @@
+{
+  "miniprogramRoot": "miniprogram/",
+  "cloudfunctionRoot": "cloudfunctions/",
+  "setting": {
+    "urlCheck": true,
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "preloadBackgroundData": false,
+    "minified": true,
+    "newFeature": true,
+    "coverView": true,
+    "nodeModules": true,
+    "autoAudits": true,
+    "showShadowRootInWxmlPanel": true,
+    "scopeDataCheck": false,
+    "uglifyFileName": false,
+    "checkInvalidKey": true,
+    "checkSiteMap": true,
+    "uploadWithSourceMap": true,
+    "compileHotReLoad": false,
+    "useMultiFrameRuntime": true,
+    "useApiHook": true,
+    "useApiHostProcess": true,
+    "babelSetting": {
+      "ignore": [],
+      "disablePlugins": [],
+      "outputPath": ""
+    },
+    "enableEngineNative": false,
+    "useIsolateContext": true,
+    "useCompilerModule": true,
+    "userConfirmedUseCompilerModuleSwitch": false,
+    "userConfirmedBundleSwitch": false,
+    "packNpmManually": true,
+    "packNpmRelationList": [
+      {
+        "packageJsonPath": "$weda_root/package.json",
+        "miniprogramNpmDistDir": "$weda_root"
+      },
+      {
+        "packageJsonPath": "$weda_root/packages/$wd_system/package.json",
+        "miniprogramNpmDistDir": "$weda_root/packages/$wd_system"
+      }
+    ],
+    "minifyWXSS": true,
+    "minifyWXML": true,
+    "minifyJS": true,
+    "lazyCodeLoading": "requiredComponents"
+  },
+  "appid": "wx042ad6201a1b0d06",
+  "projectname": "ProfessionWall",
+  "libVersion": "3.7.10",
+  "cloudfunctionTemplateRoot": "cloudfunctionTemplate/",
+  "cloudEnv": "cloud1-5g4qu1f1725f79d2",
+  "condition": {
+    "miniprogram": {
+      "list": [
+        {
+          "name": "db guide",
+          "pathName": "pages/databaseGuide/databaseGuide",
+          "query": ""
+        }
+      ]
+    }
+  },
+  "compileType": "miniprogram",
+  "srcMiniprogramRoot": "miniprogram/",
+  "packOptions": {
+    "ignore": [
+      {
+        "value": "node_modules",
+        "type": "folder"
+      },
+      {
+        "value": ".md",
+        "type": "suffix"
+      }
+    ],
+    "include": []
+  },
+  "editorSetting": {
+    "tabIndent": "insertSpaces",
+    "tabSize": 2
+  }
+}
